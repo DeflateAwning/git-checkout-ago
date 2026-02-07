@@ -1,7 +1,19 @@
 [package]
 name = "git-checkout-ago"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
+
+description = "`git checkout-ago 'x months'` alias to immediately browse a repo during its golden era (or like, before your oopsie)"
+license = "Unlicense"
+
+repository = "https://github.com/DeflateAwning/git-checkout-ago"
+homepage = "https://github.com/DeflateAwning/git-checkout-ago"
+
+keywords = ["git", "cli", "developer-tools"]
+categories = ["command-line-utilities", "development-tools"]
+
+authors = ["DeflateAwning"]
+
 
 [dependencies]
 
