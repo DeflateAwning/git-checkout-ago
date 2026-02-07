@@ -34,7 +34,7 @@ fn run(ago: &str) -> Result<(), Box<dyn Error>> {
         return Err("no commit found before the given time".into());
     }
 
-    let checkout = Command::new("git").args(&checkout_args(&commit)).status()?;
+    let checkout = Command::new("git").args(checkout_args(&commit)).status()?;
 
     if !checkout.success() {
         return Err("git checkout failed".into());
@@ -46,17 +46,14 @@ fn run(ago: &str) -> Result<(), Box<dyn Error>> {
 fn main() {
     let mut args = env::args().skip(1);
 
-    let ago = match args.next() {
-        Some(a) => a,
-        None => {
-            eprintln!("usage: checkout-ago <time>");
-            eprintln!(r#"example: checkout-ago "2 days""#);
-            std::process::exit(1);
-        }
+    let Some(ago) = args.next() else {
+        eprintln!("usage: checkout-ago <time>");
+        eprintln!(r#"example: checkout-ago "2 days""#);
+        std::process::exit(1);
     };
 
     if let Err(e) = run(&ago) {
-        eprintln!("error: {}", e);
+        eprintln!("error: {e}");
         std::process::exit(1);
     }
 }
