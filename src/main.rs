@@ -22,9 +22,7 @@ fn checkout_args(commit: &str) -> Vec<String> {
 fn run(ago: &str) -> Result<(), Box<dyn Error>> {
     let rev_args = rev_list_args(ago);
 
-    let output = Command::new("git")
-        .args(&rev_args)
-        .output()?;
+    let output = Command::new("git").args(&rev_args).output()?;
 
     if !output.status.success() {
         return Err("git rev-list failed".into());
@@ -36,9 +34,7 @@ fn run(ago: &str) -> Result<(), Box<dyn Error>> {
         return Err("no commit found before the given time".into());
     }
 
-    let checkout = Command::new("git")
-        .args(&checkout_args(&commit))
-        .status()?;
+    let checkout = Command::new("git").args(&checkout_args(&commit)).status()?;
 
     if !checkout.success() {
         return Err("git checkout failed".into());
@@ -75,13 +71,7 @@ mod tests {
 
         assert_eq!(
             args,
-            vec![
-                "rev-list",
-                "-n",
-                "1",
-                "--before=2 days ago",
-                "HEAD"
-            ]
+            vec!["rev-list", "-n", "1", "--before=2 days ago", "HEAD"]
         );
     }
 
@@ -89,13 +79,7 @@ mod tests {
     fn test_checkout_args() {
         let args = checkout_args("abc123");
 
-        assert_eq!(
-            args,
-            vec![
-                "checkout",
-                "abc123"
-            ]
-        );
+        assert_eq!(args, vec!["checkout", "abc123"]);
     }
 
     #[test]
