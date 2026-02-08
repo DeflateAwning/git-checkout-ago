@@ -1,6 +1,6 @@
+use clap::Parser;
 use std::error::Error;
 use std::process::Command;
-use clap::Parser;
 
 /// Checkout the most recent commit before a given time.
 #[derive(Parser, Debug)]
@@ -14,7 +14,6 @@ struct Cli {
     #[arg(value_name = "TIME")]
     ago: String,
 }
-
 
 /// Convert shorthand like `2d`, `3h`, `1w` into git-compatible strings.
 /// If the input doesn't match shorthand, return it unchanged.
@@ -98,7 +97,6 @@ fn main() {
         std::process::exit(1);
     }
 }
-
 
 #[cfg(test)]
 mod tests {
