@@ -102,7 +102,7 @@ fn run(ago: &str, print_only: bool) -> Result<(), Box<dyn Error>> {
     }
 
     if !print_only {
-        println!("");
+        println!();
         let checkout = Command::new("git").args(checkout_args(&target)).status()?;
 
         if !checkout.success() {
