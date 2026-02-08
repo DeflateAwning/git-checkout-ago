@@ -13,6 +13,20 @@ struct Cli {
     /// Time before now (e.g. "2 days", 2d, 3h, 1w)
     #[arg(value_name = "TIME")]
     ago: String,
+
+    /// Only print where you are and where you would jump to
+    #[arg(long, alias = "show")]
+    print: bool,
+}
+
+fn current_head() -> Result<String, Box<dyn Error>> {
+    let output = Command::new("git").args(["rev-parse", "HEAD"]).output()?;
+
+    if !output.status.success() {
+        return Err("git rev-parse failed".into());
+    }
+
+    Ok(String::from_utf8(output.stdout)?.trim().to_string())
 }
 
 /// Convert shorthand like `2d`, `3h`, `1w` into git-compatible strings.
@@ -65,25 +79,35 @@ fn checkout_args(commit: &str) -> Vec<String> {
 }
 
 /// Core logic, split out for testability.
-fn run(ago: &str) -> Result<(), Box<dyn Error>> {
-    let rev_args = rev_list_args(ago);
+fn run(ago: &str, print_only: bool) -> Result<(), Box<dyn Error>> {
+    let original_head = current_head()?;
 
+    let rev_args = rev_list_args(ago);
     let output = Command::new("git").args(&rev_args).output()?;
 
     if !output.status.success() {
         return Err("git rev-list failed".into());
     }
 
-    let commit = String::from_utf8(output.stdout)?.trim().to_string();
+    let target = String::from_utf8(output.stdout)?.trim().to_string();
 
-    if commit.is_empty() {
+    if target.is_empty() {
         return Err("no commit found before the given time".into());
     }
 
-    let checkout = Command::new("git").args(checkout_args(&commit)).status()?;
+    {
+        println!("Current HEAD: {original_head}");
+        println!("Target commit: {target}");
+        println!("To return: git checkout {original_head}");
+    }
 
-    if !checkout.success() {
-        return Err("git checkout failed".into());
+    if !print_only {
+        println!("");
+        let checkout = Command::new("git").args(checkout_args(&target)).status()?;
+
+        if !checkout.success() {
+            return Err("git checkout failed".into());
+        }
     }
 
     Ok(())
@@ -92,7 +116,7 @@ fn run(ago: &str) -> Result<(), Box<dyn Error>> {
 fn main() {
     let cli = Cli::parse();
 
-    if let Err(e) = run(&cli.ago) {
+    if let Err(e) = run(&cli.ago, cli.print) {
         eprintln!("error: {e}");
         std::process::exit(1);
     }
