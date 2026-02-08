@@ -16,6 +16,7 @@ authors = ["DeflateAwning"]
 
 
 [dependencies]
+clap = { version = "4.5.57", features = ["derive"] }
 
 [lints.clippy]
 all = "deny"
