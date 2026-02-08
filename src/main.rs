@@ -1,6 +1,20 @@
-use std::env;
 use std::error::Error;
 use std::process::Command;
+use clap::Parser;
+
+/// Checkout the most recent commit before a given time.
+#[derive(Parser, Debug)]
+#[command(
+    name = "checkout-ago",
+    about = "Check out the most recent git commit before a given time",
+    long_about = None
+)]
+struct Cli {
+    /// Time before now (e.g. "2 days", 2d, 3h, 1w)
+    #[arg(value_name = "TIME")]
+    ago: String,
+}
+
 
 /// Convert shorthand like `2d`, `3h`, `1w` into git-compatible strings.
 /// If the input doesn't match shorthand, return it unchanged.
@@ -77,24 +91,14 @@ fn run(ago: &str) -> Result<(), Box<dyn Error>> {
 }
 
 fn main() {
-    let mut args = env::args().skip(1);
+    let cli = Cli::parse();
 
-    let Some(ago) = args.next() else {
-        eprintln!("usage: checkout-ago <time>");
-        eprintln!(
-            r#"examples:
-  checkout-ago "2 days"
-  checkout-ago 2d
-  checkout-ago 3h"#
-        );
-        std::process::exit(1);
-    };
-
-    if let Err(e) = run(&ago) {
+    if let Err(e) = run(&cli.ago) {
         eprintln!("error: {e}");
         std::process::exit(1);
     }
 }
+
 
 #[cfg(test)]
 mod tests {
