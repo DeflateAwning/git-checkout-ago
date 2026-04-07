@@ -40,7 +40,11 @@ fn normalize_ago(input: &str) -> String {
 
     // Split into numeric prefix and the rest
     let split_idx = input
-        .find(|c: char| !c.is_ascii_digit())
+        .find(|c: char| {
+            !(c.is_ascii_digit() ||
+            // Allow decimal points in the number:
+            c == '.')
+        })
         .unwrap_or(input.len());
 
     let (number, rest) = input.split_at(split_idx);
@@ -159,6 +163,13 @@ mod tests {
     fn test_normalize_shorthand_days() {
         assert_eq!(normalize_ago("1d"), "1 day");
         assert_eq!(normalize_ago("2d"), "2 days");
+    }
+
+    #[test]
+    fn test_normalize_decimal_days() {
+        assert_eq!(normalize_ago("1.5d"), "1.5 days");
+        assert_eq!(normalize_ago("2.5d"), "2.5 days");
+        assert_eq!(normalize_ago("2.1d"), "2.1 days");
     }
 
     #[test]
