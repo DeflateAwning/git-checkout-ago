@@ -7,7 +7,8 @@ use std::process::Command;
 #[command(
     name = "checkout-ago",
     about = "Check out the most recent git commit before a given time",
-    long_about = None
+    long_about = None,
+    version
 )]
 struct Cli {
     /// Time before now (e.g. "2 days", 2d, 3h, 1w)
