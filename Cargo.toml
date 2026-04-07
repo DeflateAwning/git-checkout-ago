@@ -1,6 +1,6 @@
 [package]
 name = "git-checkout-ago"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2024"
 
 description = "`git checkout-ago 'x months'` alias to immediately browse a repo during its golden era (or like, before your oopsie)"
