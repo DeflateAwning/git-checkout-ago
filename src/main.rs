@@ -38,26 +38,34 @@ fn normalize_ago(input: &str) -> String {
         return input.to_string();
     }
 
-    let (number, unit) = input.split_at(
-        input
-            .find(|c: char| !c.is_ascii_digit())
-            .unwrap_or(input.len()),
-    );
+    // Split into numeric prefix and the rest
+    let split_idx = input
+        .find(|c: char| !c.is_ascii_digit())
+        .unwrap_or(input.len());
 
-    if number.is_empty() || unit.is_empty() {
+    let (number, rest) = input.split_at(split_idx);
+
+    if number.is_empty() || rest.trim().is_empty() {
         return input.to_string();
     }
 
-    let expanded_unit = match unit {
-        "s" => "seconds",
-        "m" => "minutes",
-        "h" => "hours",
-        "d" => "days",
-        "w" => "weeks",
+    // Normalize unit: remove whitespace, lowercase
+    let unit = rest.trim().to_ascii_lowercase();
+
+    let expanded = match unit.as_str() {
+        "s" | "sec" | "second" | "seconds" => "second",
+        "m" | "min" | "minute" | "minutes" => "minute",
+        "h" | "hr" | "hour" | "hours" => "hour",
+        "d" | "day" | "days" => "day",
+        "w" | "week" | "weeks" => "week",
+        "mo" | "month" | "months" => "month",
+        "y" | "year" | "years" => "year",
         _ => return input.to_string(),
     };
 
-    format!("{number} {expanded_unit}")
+    let optional_plural = if number == "1" { "" } else { "s" };
+
+    format!("{number} {expanded}{optional_plural}")
 }
 
 /// Build the `git rev-list` command arguments for a given "ago" string.
@@ -96,9 +104,15 @@ fn run(ago: &str, print_only: bool) -> Result<(), Box<dyn Error>> {
     }
 
     {
-        println!("Current HEAD: {original_head}");
-        println!("Target commit: {target}");
+        let ago_normalized = normalize_ago(ago);
+        println!("Current HEAD:  {original_head}");
+        println!("Target commit: {target} ({ago_normalized})");
+        if original_head == target {
+            println!("[WARNING] Already at the target commit. Nothing to do.");
+            return Ok(());
+        }
         println!("To return: git checkout {original_head}");
+        println!("-----------------------------------------------------");
     }
 
     if !print_only {
@@ -127,18 +141,29 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_normalize_shorthand_months() {
+        assert_eq!(normalize_ago("1mo"), "1 month");
+        assert_eq!(normalize_ago("2mo"), "2 months");
+        assert_eq!(normalize_ago("3mo"), "3 months");
+        assert_eq!(normalize_ago("4 months"), "4 months"); // Passthrough.
+        assert_eq!(normalize_ago("4months"), "4 months");
+    }
+
+    #[test]
+    fn test_normalize_shorthand_weeks() {
+        assert_eq!(normalize_ago("1w"), "1 week");
+        assert_eq!(normalize_ago("2w"), "2 weeks");
+    }
+
+    #[test]
     fn test_normalize_shorthand_days() {
+        assert_eq!(normalize_ago("1d"), "1 day");
         assert_eq!(normalize_ago("2d"), "2 days");
     }
 
     #[test]
     fn test_normalize_shorthand_hours() {
         assert_eq!(normalize_ago("3h"), "3 hours");
-    }
-
-    #[test]
-    fn test_normalize_shorthand_weeks() {
-        assert_eq!(normalize_ago("1w"), "1 weeks");
     }
 
     #[test]
