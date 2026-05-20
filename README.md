@@ -1,5 +1,5 @@
 # git-checkout-ago
-`git checkout-ago 'x months'` alias to immediately browse a repo during its golden era (or like, before your oopsie)
+`git checkout-ago 'x months'` alias to browse a repo at a point in the past
 
 ## Usage
 
@@ -19,7 +19,7 @@ git checkout-ago '1 hour'
 
 ## Alternatives
 
-Well, now this tool exists. Apparently built-in git features exist for this too though.
+Well, now this tool exists. Apparently built-in git features exist for similar functionality.
 
 ### Alternative 1
 

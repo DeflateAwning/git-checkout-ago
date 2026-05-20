@@ -1,9 +1,9 @@
 [package]
 name = "git-checkout-ago"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2024"
 
-description = "`git checkout-ago 'x months'` alias to immediately browse a repo during its golden era (or like, before your oopsie)"
+description = "`git checkout-ago 'x months'` alias to browse a repo at a point in the past"
 license = "Unlicense"
 
 repository = "https://github.com/DeflateAwning/git-checkout-ago"
